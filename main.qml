@@ -3,7 +3,6 @@ import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.3
 import Qt.labs.folderlistmodel 2.1
 import Audio 1.0
-import OpenGL 1.0
 
 ApplicationWindow {
     visible: true

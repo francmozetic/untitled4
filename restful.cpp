@@ -384,13 +384,13 @@ void RestfulWorker::levelsSequencePutJson()                                     
 
 void RestfulWorker::sessionRun()
 {
-    qInfo() << "Session run ...";
+    qDebug() << "Session run ...";
     processBuffer();
 }
 
 void RestfulWorker::processBuffer()
 {
-    qInfo() << "Audio processing ...";
+    qDebug() << "Audio processing ...";
     emit bufferReady();
-    qInfo() << "... finished.";
+    qDebug() << "... finished.";
 }

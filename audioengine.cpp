@@ -332,8 +332,7 @@ void Engine::calculateLevels(qint64 position, qint64 length)                    
         bufferStr.append(" ");
     }
 
-    qInfo() << bufferStr; */
+    qDebug() << bufferStr; */
 
     emit bufferReady();
 }
-

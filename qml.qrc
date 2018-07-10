@@ -6,7 +6,6 @@
         <file>ic_play_arrow_black_36dp.png</file>
         <file>ic_fingerprint_black_36dp.png</file>
         <file>ic_gesture_black_36dp.png</file>
-        <file>myqml.qml</file>
         <file>ic_content_cut_black_36dp.png</file>
         <file>ic_cloud_queue_black_36dp.png</file>
     </qresource>
