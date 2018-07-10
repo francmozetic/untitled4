@@ -2,7 +2,6 @@
 #include <QQmlApplicationEngine>
 
 #include "paintedlevels.h"
-#include "squircle.h"
 
 QString localFile;
 
@@ -19,12 +18,6 @@ int main(int argc, char *argv[])
     localFile = "/home/root/audio2.wav";
 
     qmlRegisterType<PaintedLevels>("Audio", 1, 0, "PaintedLevels");
-    qmlRegisterType<Squircle>("OpenGL", 1, 0, "Squircle");
-
-    /* QQuickView view;
-    view.setResizeMode(QQuickView::SizeRootObjectToView);
-    view.setSource(QUrl(QStringLiteral("qrc:/myqml.qml")));
-    view.show(); */
 
     QQmlApplicationEngine qmlEngine;
     qmlEngine.load(QUrl(QStringLiteral("qrc:/main.qml")));
@@ -43,3 +36,11 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
+
+/* Qt Squircle
+qmlRegisterType<Squircle>("OpenGL", 1, 0, "Squircle");
+
+QQuickView view;
+view.setResizeMode(QQuickView::SizeRootObjectToView);
+view.setSource(QUrl(QStringLiteral("qrc:/myqml.qml")));
+view.show(); */

@@ -5,18 +5,16 @@ QT += quick
 QT += multimedia
 
 HEADERS += \
-    paintedlevels.h \
-    wavfile.h \
     audioengine.h \
-    squircle.h \
-    restful.h
+    paintedlevels.h \
+    restful.h \
+    wavfile.h
 
 SOURCES += main.cpp \
-    paintedlevels.cpp \
-    wavfile.cpp \
     audioengine.cpp \
-    squircle.cpp \
-    restful.cpp
+    paintedlevels.cpp \
+    restful.cpp \
+    wavfile.cpp
 
 RESOURCES += qml.qrc
 
