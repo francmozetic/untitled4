@@ -12,8 +12,7 @@ const qint64 BufferDurationUs = 5 * 1000000;                // buffer duration i
 const int LevelWindowUs = 0.1 * 1000000;                    // level window duration in microsec
 const int NotifyIntervalMs = 10;                            // notify interval in milisec (based on milisec of audio data processed)
 
-Engine::Engine(QObject *parent)                             // ok
-    :   QObject(parent)
+Engine::Engine(QObject *parent) : QObject(parent)           // ok
     ,   m_mode(QAudio::AudioInput)
     ,   m_state(QAudio::StoppedState)
     ,   m_file(0)
@@ -40,7 +39,7 @@ Engine::~Engine()
 
 void Engine::startRecording()                               // ok
 {
-    qInfo() << "Start recording ...";
+    qDebug() << "Start recording ...";
 
     QAudioFormat format;
     format.setSampleRate(44100);
@@ -72,7 +71,7 @@ void Engine::startRecording()                               // ok
 
 void Engine::startPlayback()                                // ok
 {
-    qInfo() << "Start playback ...";
+    qDebug() << "Start playback ...";
 
     m_file = new WavFile(this);
     m_file->open(localFile);

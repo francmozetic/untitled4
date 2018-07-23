@@ -7,8 +7,7 @@ extern QVector<qreal> frequenciesSpectrum;
 
 bool isPending = false;
 
-RestfulWorker::RestfulWorker(QObject *parent)
-    : QObject(parent)
+RestfulWorker::RestfulWorker(QObject *parent) : QObject(parent)
 {
     QAudioFormat format;
     format.setSampleRate(44100);

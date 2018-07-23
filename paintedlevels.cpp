@@ -24,8 +24,7 @@ QString bufferEndian;
 QString bufferChannels;
 QString bufferFormat;
 
-PaintedLevels::PaintedLevels(QQuickItem *parent)
-    : QQuickPaintedItem(parent)
+PaintedLevels::PaintedLevels(QQuickItem *parent) : QQuickPaintedItem(parent)
 {
     Engine *audioEngine = new Engine();
     QObject::connect(this, &PaintedLevels::control1, audioEngine, &Engine::startRecording);
