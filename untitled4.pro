@@ -8,13 +8,15 @@ HEADERS += \
     audioengine.h \
     paintedlevels.h \
     restful.h \
-    wavfile.h
+    wavfile.h \
+    self-similarity.h
 
 SOURCES += main.cpp \
     audioengine.cpp \
     paintedlevels.cpp \
     restful.cpp \
-    wavfile.cpp
+    wavfile.cpp \
+    self-similarity.cpp
 
 RESOURCES += qml.qrc
 
