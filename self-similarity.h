@@ -1,0 +1,5 @@
+#ifndef SELFSIMILARITY
+#define SELFSIMILARITY
+
+#endif // SELFSIMILARITY
+
