@@ -3,13 +3,18 @@
 #include <algorithm>
 #include <numeric>
 #include <complex>
+#include <fstream>
 #include <vector>
 #include <map>
 #include <math.h>
 
+#include <QDebug>
+
 /* As introduced to the music information retrieval world by Foote (2000), self-similarity matrices
  * turn multi-dimensional feature vectors from an audio signal into a clear and easily-readable 2-dimensional image. This is
- * done by breaking the original audio signal down into frames and computing feature vectors for each frame.
+ * done by breaking the original audio signal down into frames and computing feature vectors for each frame, where the feature
+ * vectors can contain STFT values, MFCCs, chroma vectors, or any other musical feature of choice. The length of the frames
+ * determines the resolution of the resultant self-similarity matrix.
  *
  * MFCC feature vectors calculation is based on D S Pavan Kumar's MFCC Feature Extractor using C++ STL and C++11. Thank you.
  * Please check the following github repository: https://github.com/dspavankumar/compute-mfcc.
@@ -81,6 +86,52 @@ std::string SelfSimilarity::processFrame(int16_t* samples, size_t N) {
 
     return v_d_to_string(mfcc);
 }
+
+// Read input file stream, extract MFCCs and write to output file stream
+int SelfSimilarity::process (std::ifstream &wavFp, std::ofstream &mfcFp) {
+    // Read the wav header
+    wavHeader hdr;
+    int headerSize = sizeof(wavHeader);
+    wavFp.read((char *) &hdr, headerSize);
+
+    // Check audio format
+    if (hdr.AudioFormat != 1 || hdr.bitsPerSample != 16) {
+        qDebug() << "Unsupported audio format, use 16 bit PCM Wave";
+        return 1;
+    }
+    // Check sampling rate
+    if (hdr.SamplesPerSec != fs) {
+        qDebug() << "Sampling rate mismatch: Found " << hdr.SamplesPerSec << " instead of " << fs;
+        return 1;
+    }
+
+    // Initialise buffer
+    uint16_t bufferLength = winLengthSamples-frameShiftSamples;
+    int16_t* buffer = new int16_t[bufferLength];
+    int bufferBPS = (sizeof buffer[0]);
+
+    // Read and set the initial samples
+    wavFp.read((char *) buffer, bufferLength*bufferBPS);
+    for (int i=0; i<bufferLength; i++)
+        prevSamples[i] = buffer[i];
+    delete [] buffer;
+
+    // Recalculate buffer size
+    bufferLength = frameShiftSamples;
+    buffer = new int16_t[bufferLength];
+
+    // Read data and process each frame
+    wavFp.read((char *) buffer, bufferLength*bufferBPS);
+    while (wavFp.gcount() == bufferLength*bufferBPS && !wavFp.eof()) {
+        mfcFp << processFrame(buffer, bufferLength);
+        wavFp.read((char *) buffer, bufferLength*bufferBPS);
+    }
+    delete [] buffer;
+    buffer = nullptr;
+    return 0;
+}
+
+// ***** Conversion functions *****
 
 // Hertz to Mel conversion
 inline double hz2mel(double f) {

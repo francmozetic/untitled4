@@ -7,7 +7,7 @@
 class PaintedLevels : public QQuickPaintedItem
 {
     Q_OBJECT
-    QThread workerThread;
+    QThread restfulThread;
 
 public:
     PaintedLevels(QQuickItem *parent = 0);

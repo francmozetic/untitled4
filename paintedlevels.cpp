@@ -32,12 +32,12 @@ PaintedLevels::PaintedLevels(QQuickItem *parent) : QQuickPaintedItem(parent)
     QObject::connect(audioEngine, &Engine::bufferChanged, this, &PaintedLevels::bufferChanged);
 
     RestfulWorker *restfulWorker = new RestfulWorker();
-    restfulWorker->moveToThread(&workerThread);
-    QObject::connect(&workerThread, &QThread::finished, restfulWorker, &QObject::deleteLater);
+    restfulWorker->moveToThread(&restfulThread);
+    QObject::connect(&restfulThread, &QThread::finished, restfulWorker, &QObject::deleteLater);
     QObject::connect(this, &PaintedLevels::control3, restfulWorker, &RestfulWorker::levelsSequencePostJson);
     QObject::connect(this, &PaintedLevels::control4, restfulWorker, &RestfulWorker::levelsSequencePutJson);
     QObject::connect(this, &PaintedLevels::control5, restfulWorker, &RestfulWorker::statusGetJsonIsPending);
-    workerThread.start();
+    restfulThread.start();
 
     const qint64 waveformDurationUs = 2.0 * 1000000;        // waveform window duration in microsec
     const qint64 analysisDurationUs = 0.1 * 1000000;        // analysis window duration in microsec
