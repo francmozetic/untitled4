@@ -10,7 +10,7 @@
 
 #include <QDebug>
 
-/* As introduced to the music information retrieval world by Foote (2000), self-similarity matrices
+/* As introduced to the music information retrieval world by Jonathan Foote (2000), self-similarity matrices
  * turn multi-dimensional feature vectors from an audio signal into a clear and easily-readable 2-dimensional image. This is
  * done by breaking the original audio signal down into frames and computing feature vectors for each frame, where the feature
  * vectors can contain STFT values, MFCCs, chroma vectors, or any other musical feature of choice. The width of the frames
