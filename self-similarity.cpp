@@ -13,7 +13,7 @@
 /* As introduced to the music information retrieval world by Foote (2000), self-similarity matrices
  * turn multi-dimensional feature vectors from an audio signal into a clear and easily-readable 2-dimensional image. This is
  * done by breaking the original audio signal down into frames and computing feature vectors for each frame, where the feature
- * vectors can contain STFT values, MFCCs, chroma vectors, or any other musical feature of choice. The length of the frames
+ * vectors can contain STFT values, MFCCs, chroma vectors, or any other musical feature of choice. The width of the frames
  * determines the resolution of the resultant self-similarity matrix.
  *
  * MFCC feature vectors calculation is based on D S Pavan Kumar's MFCC Feature Extractor using C++ STL and C++11. Thank you.
@@ -28,7 +28,7 @@ typedef std::map<int,std::map<int,c_d>> twmap;
 
 const double PI = 4*atan(1.0);
 std::map<int,std::map<int,std::complex<double>>> twiddle;
-size_t winLengthSamples, frameShiftSamples, numFFTBins;
+size_t winWidthSamples, frameShiftSamples, numFFTBins;
 std::vector<double> frame, powerSpectralCoef, lmfbCoef, hamming, mfcc, prevSamples;
 std::vector<std::vector<double>> fbank, dct;
 
@@ -40,15 +40,15 @@ SelfSimilarity::SelfSimilarity(QObject *parent) : QObject(parent)
     preEmphCoef = 0.97;         // ok
     lowFreq = 50;
     highFreq = 6500;
-    numFFT = 512;               // ok
-    winLength = 25;
-    frameShift = 10;
+    numFFT = 512;               // n-point FFT on each frame
+    winWidth = 25;              // window width
+    frameShift = 10;            // frame shift
 
-    winLengthSamples = winLength * fs / 1000;
+    winWidthSamples = winWidth * fs / 1000;
     frameShiftSamples = frameShift * fs / 1000;
     numFFTBins = numFFT / 2 + 1;
     powerSpectralCoef.assign(numFFTBins, 0);
-    prevSamples.assign(winLengthSamples - frameShiftSamples, 0);
+    prevSamples.assign(winWidthSamples - frameShiftSamples, 0);
 
     initFilterbank();
     initHammingDct();
@@ -106,7 +106,7 @@ int SelfSimilarity::process (std::ifstream &wavFp, std::ofstream &mfcFp) {
     }
 
     // Initialise buffer
-    uint16_t bufferLength = winLengthSamples-frameShiftSamples;
+    uint16_t bufferLength = winWidthSamples - frameShiftSamples;
     int16_t* buffer = new int16_t[bufferLength];
     int bufferBPS = (sizeof buffer[0]);
 
@@ -131,7 +131,7 @@ int SelfSimilarity::process (std::ifstream &wavFp, std::ofstream &mfcFp) {
     return 0;
 }
 
-// ***** Conversion functions *****
+// ***** Conversion functions and FFT recursive function *****
 
 // Hertz to Mel conversion
 inline double hz2mel(double f) {
@@ -284,9 +284,9 @@ void SelfSimilarity::initHammingDct(void) {
     size_t i, j;
 
     // After slicing the signal into frames, we apply a window function such as the Hamming window to each frame.
-    hamming.assign(winLengthSamples,0);
-    for (i=0; i<winLengthSamples; i++)
-        hamming[i] = 0.54 - 0.46 * cos(2 * PI * i / (winLengthSamples-1));
+    hamming.assign(winWidthSamples,0);
+    for (i=0; i<winWidthSamples; i++)
+        hamming[i] = 0.54 - 0.46 * cos(2 * PI * i / (winWidthSamples-1));
 
     v_d v1(numCepstral+1,0), v2(numFilters,0);
     for (i=0; i <= numCepstral; i++)

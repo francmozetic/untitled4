@@ -28,7 +28,7 @@ private:
     size_t      numCepstral;
     size_t      numFilters;
     size_t      numFFT;
-    size_t      winLength;
+    size_t      winWidth;
     size_t      frameShift;
     double      preEmphCoef;
     double      lowFreq;
