@@ -18,19 +18,20 @@
  *
  * MFCC feature vectors calculation is based on D S Pavan Kumar's MFCC Feature Extractor using C++ STL and C++11. Thank you.
  * Please check the following github repository: https://github.com/dspavankumar/compute-mfcc.
+ * Copyright dspavankumar@gmail.com
  */
 
 typedef std::vector<double> v_d;
 typedef std::complex<double> c_d;
 typedef std::vector<v_d> v_v_d;
 typedef std::vector<c_d> v_c_d;
-typedef std::map<int,std::map<int,c_d>> twmap;
+typedef std::map<int, std::map<int, c_d>> twmap;
 
 const double PI = 4*atan(1.0);
-std::map<int,std::map<int,std::complex<double>>> twiddle;
 size_t winWidthSamples, frameShiftSamples, numFFTBins;
-std::vector<double> frame, powerSpectralCoef, lmfbCoef, hamming, mfcc, prevSamples;
+std::vector<double> frame, prevSamples, powerSpectralCoef, lmfbCoef, hamming, mfcc;
 std::vector<std::vector<double>> fbank, dct;
+std::map<int, std::map<int, std::complex<double>>> twiddle;
 
 SelfSimilarity::SelfSimilarity(QObject *parent) : QObject(parent)
 {
@@ -40,7 +41,7 @@ SelfSimilarity::SelfSimilarity(QObject *parent) : QObject(parent)
     preEmphCoef = 0.97;         // ok
     lowFreq = 50;
     highFreq = 6500;
-    numFFT = 512;               // n-point FFT on each frame
+    numFFT = 512;               // N-point FFT on each frame
     winWidth = 25;              // window width
     frameShift = 10;            // frame shift
 
@@ -92,7 +93,7 @@ int SelfSimilarity::process (std::ifstream &wavFp, std::ofstream &mfcFp) {
     // Read the wav header
     wavHeader hdr;
     int headerSize = sizeof(wavHeader);
-    wavFp.read((char *) &hdr, headerSize);
+    wavFp.read((char *) &hdr, headerSize); // cast,
 
     // Check audio format
     if (hdr.AudioFormat != 1 || hdr.bitsPerSample != 16) {
@@ -105,15 +106,15 @@ int SelfSimilarity::process (std::ifstream &wavFp, std::ofstream &mfcFp) {
         return 1;
     }
 
-    // Initialise buffer
+    // Initialise buffer (allocate a block of memory of type int16_t, dynamically allocated memory is allocated on Heap^)
     uint16_t bufferLength = winWidthSamples - frameShiftSamples;
     int16_t* buffer = new int16_t[bufferLength];
-    int bufferBPS = (sizeof buffer[0]);
+    int bufferBPS = (sizeof buffer[0]);                     // bytes per sample (size of the first element in bytes)
 
     // Read and set the initial samples
     wavFp.read((char *) buffer, bufferLength*bufferBPS);
     for (int i=0; i<bufferLength; i++)
-        prevSamples[i] = buffer[i];
+        prevSamples[i] = buffer[i];                         // prevSamples[i] is an ith element of std::vector<double>
     delete [] buffer;
 
     // Recalculate buffer size
@@ -134,12 +135,12 @@ int SelfSimilarity::process (std::ifstream &wavFp, std::ofstream &mfcFp) {
 // ***** Conversion functions and FFT recursive function *****
 
 // Hertz to Mel conversion
-inline double hz2mel(double f) {
+inline double Hz2Mel(double f) {
     return 2595*std::log10(1 + f/700);
 }
 
 // Mel to Hertz conversion
-inline double mel2hz(double m) {
+inline double Mel2Hz(double m) {
     return 700*(std::pow(10, m/2595) - 1);
 }
 
@@ -188,8 +189,12 @@ void SelfSimilarity::preEmphHamming(void) {
 }
 
 /* Power spectrum computation
+ * After pre-emphasis, we need to split the signal into short-time frames. We can safely assume that frequencies in a signal
+ * are stationary over a very short period of time. Therefore, by doing a Fourier transform over this short-time frame,
+ * we can obtain a good approximation of the frequency contours of the signal by concatenating adjacent frames.
+ *
  * We can now do an N-point FFT on each frame to calculate the frequency spectrum, which is also called Short-Time
- * Fourier-Transform (STFT), where N is typically 256 or 512, numFFT = 512; and then compute the power spectrum (periodogram)
+ * Fourier-Transform, where N is typically 256 or 512, numFFT = 512 in this case; and then compute the power spectrum (periodogram)
  * using the following equation: P=|FFT(xi)|^2 where, xi is the ith frame of signal x.
  */
 void SelfSimilarity::compPowerSpec(void) {
@@ -242,14 +247,14 @@ void SelfSimilarity::applyDct(void) {
 // Precompute filterbank
 void SelfSimilarity::initFilterbank () {
     // Convert low and high frequencies to Mel scale
-    double lowFreqMel = hz2mel(lowFreq);
-    double highFreqMel = hz2mel(highFreq);
+    double lowFreqMel = Hz2Mel(lowFreq);
+    double highFreqMel = Hz2Mel(highFreq);
 
     // Calculate filter centre-frequencies
     v_d filterCentreFreq;
     filterCentreFreq.reserve(numFilters+2);
     for (size_t i=0; i<numFilters+2; i++)
-        filterCentreFreq.push_back(mel2hz(lowFreqMel + (highFreqMel-lowFreqMel)/(numFilters+1)*i));
+        filterCentreFreq.push_back(Mel2Hz(lowFreqMel + (highFreqMel-lowFreqMel)/(numFilters+1)*i));
 
     // Calculate FFT bin frequencies
     v_d fftBinFreq;
