@@ -93,7 +93,7 @@ int SelfSimilarity::process (std::ifstream &wavFp, std::ofstream &mfcFp) {
     // Read the wav header
     wavHeader hdr;
     int headerSize = sizeof(wavHeader);
-    wavFp.read((char *) &hdr, headerSize); // cast,
+    wavFp.read((char *) &hdr, headerSize); // cast the address of hdr, denoted &hdr, to a char *, i.e. a pointer to characters/bytes
 
     // Check audio format
     if (hdr.AudioFormat != 1 || hdr.bitsPerSample != 16) {
@@ -108,11 +108,11 @@ int SelfSimilarity::process (std::ifstream &wavFp, std::ofstream &mfcFp) {
 
     // Initialise buffer (allocate a block of memory of type int16_t, dynamically allocated memory is allocated on Heap^)
     uint16_t bufferLength = winWidthSamples - frameShiftSamples;
-    int16_t* buffer = new int16_t[bufferLength];
+    int16_t* buffer = new int16_t[bufferLength];            // allocate a block of memory of type int16_t
     int bufferBPS = (sizeof buffer[0]);                     // bytes per sample (size of the first element in bytes)
 
     // Read and set the initial samples
-    wavFp.read((char *) buffer, bufferLength*bufferBPS);
+    wavFp.read((char *) buffer, bufferLength*bufferBPS);    // cast the pointer of the int16_t variable to a pointer to characters/bytes
     for (int i=0; i<bufferLength; i++)
         prevSamples[i] = buffer[i];                         // prevSamples[i] is an ith element of std::vector<double>
     delete [] buffer;
