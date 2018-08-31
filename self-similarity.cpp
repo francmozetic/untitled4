@@ -18,7 +18,6 @@
  *
  * MFCC feature vectors calculation is based on D S Pavan Kumar's MFCC Feature Extractor using C++ STL and C++11. Thank you.
  * Please check the following github repository: https://github.com/dspavankumar/compute-mfcc.
- * Copyright dspavankumar@gmail.com
  */
 
 typedef std::vector<double> v_d;
@@ -35,15 +34,15 @@ std::map<int, std::map<int, std::complex<double>>> twiddle;
 
 SelfSimilarity::SelfSimilarity(QObject *parent) : QObject(parent)
 {
-    fs = 16400;                 // sampling frequency
-    numCepstral = 12;           // ok
-    numFilters = 40;            // ok
+    fs = 16000;                 // Sampling rate in Hertz (default=16000)
+    numCepstral = 12;           // Number of output cepstra, excluding log-energy (default=12)
+    numFilters = 40;            // Number of Mel warped filters in filterbank (default=40)
     preEmphCoef = 0.97;         // ok
-    lowFreq = 50;
-    highFreq = 6500;
+    lowFreq = 50;               // Filterbank low frequency cutoff in Hertz (default=50)
+    highFreq = 8000;            // Filterbank high freqency cutoff in Hertz (default=samplingrate/2)
     numFFT = 512;               // N-point FFT on each frame
-    winWidth = 25;              // window width
-    frameShift = 10;            // frame shift
+    winWidth = 25;              // Width of analysis window in milliseconds (default=25)
+    frameShift = 10;            // Frame shift in milliseconds (default=10)
 
     winWidthSamples = winWidth * fs / 1000;
     frameShiftSamples = frameShift * fs / 1000;
@@ -289,7 +288,7 @@ void SelfSimilarity::initHammingDct(void) {
     size_t i, j;
 
     // After slicing the signal into frames, we apply a window function such as the Hamming window to each frame.
-    hamming.assign(winWidthSamples,0);
+    hamming.assign(winWidthSamples, 0);
     for (i=0; i<winWidthSamples; i++)
         hamming[i] = 0.54 - 0.46 * cos(2 * PI * i / (winWidthSamples-1));
 
@@ -299,12 +298,12 @@ void SelfSimilarity::initHammingDct(void) {
     for (i=0; i < numFilters; i++)
         v2[i] = i + 0.5;
 
-    dct.reserve (numFilters*(numCepstral+1));
+    dct.reserve(numFilters*(numCepstral+1));
     double c = sqrt(2.0/numFilters);
     for (i=0; i<=numCepstral; i++) {
         v_d dtemp;
         for (j=0; j<numFilters; j++)
-            dtemp.push_back (c * cos(PI / numFilters * v1[i] * v2[j]));
+            dtemp.push_back(c * cos(PI / numFilters * v1[i] * v2[j]));
         dct.push_back(dtemp);
     }
 }
