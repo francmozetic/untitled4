@@ -39,7 +39,7 @@ SelfSimilarity::SelfSimilarity(QObject *parent) : QObject(parent)
     numFilters = 40;            // Number of Mel warped filters in filterbank (default=40)
     preEmphCoef = 0.97;         // ok
     lowFreq = 50;               // Filterbank low frequency cutoff in Hertz (default=50)
-    highFreq = 8000;            // Filterbank high freqency cutoff in Hertz (default=samplingrate/2)
+    highFreq = 8000;            // Filterbank high freqency cutoff in Hertz (default=fs/2)
     numFFT = 512;               // N-point FFT on each frame
     winWidth = 25;              // Width of analysis window in milliseconds (default=25)
     frameShift = 10;            // Frame shift in milliseconds (default=10)
@@ -88,7 +88,7 @@ std::string SelfSimilarity::processFrame(int16_t* samples, size_t N) {
 }
 
 // Read input file stream, extract MFCCs and write to output file stream
-int SelfSimilarity::process (std::ifstream &wavFp, std::ofstream &mfcFp) {
+int SelfSimilarity::process(std::ifstream &wavFp, std::ofstream &mfcFp) {
     // Read the wav header
     wavHeader hdr;
     int headerSize = sizeof(wavHeader);
@@ -107,7 +107,7 @@ int SelfSimilarity::process (std::ifstream &wavFp, std::ofstream &mfcFp) {
 
     // Initialise buffer (allocate a block of memory of type int16_t, dynamically allocated memory is allocated on Heap^)
     uint16_t bufferLength = winWidthSamples - frameShiftSamples;
-    int16_t* buffer = new int16_t[bufferLength];            // allocate a block of memory of type int16_t
+    int16_t* buffer = new int16_t[bufferLength];
     int bufferBPS = (sizeof buffer[0]);                     // bytes per sample (size of the first element in bytes)
 
     // Read and set the initial samples

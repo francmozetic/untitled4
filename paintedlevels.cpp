@@ -2,7 +2,11 @@
 #include "fftw3.h"
 
 #include "audioengine.h"
+#include "self-similarity.h"
 #include "restful.h"
+
+#include <fstream>
+#include <iostream>
 
 const int NullIndex = -1;
 int m_selection;
@@ -38,6 +42,9 @@ PaintedLevels::PaintedLevels(QQuickItem *parent) : QQuickPaintedItem(parent)
     QObject::connect(this, &PaintedLevels::control4, restfulWorker, &RestfulWorker::levelsSequencePutJson);
     QObject::connect(this, &PaintedLevels::control5, restfulWorker, &RestfulWorker::statusGetJsonIsPending);
     restfulThread.start();
+
+    SelfSimilarity *mfccProcess = new SelfSimilarity();
+    QObject::connect(this, &PaintedLevels::control7, mfccProcess, &SelfSimilarity::process);
 
     const qint64 waveformDurationUs = 2.0 * 1000000;        // waveform window duration in microsec
     const qint64 analysisDurationUs = 0.1 * 1000000;        // analysis window duration in microsec
@@ -571,8 +578,32 @@ void PaintedLevels::levelsCloudQueue()                                          
 
 void PaintedLevels::levelsFace()                                                // ok
 {
-    paint_face = true;
-    update();
+    // Initialise input and output streams
+    std::ifstream wavFp;
+    std::ofstream mfcFp;
+
+    const char* wavPath = "input.wav";
+    const char* mfcPath = "output.mfc";
+
+    // Check if input is readable
+    wavFp.open(wavPath);
+    if (!wavFp.is_open()) {
+        std::cerr << "Unable to open input file: " << wavPath << std::endl;
+    }
+
+    // Check if output is writable
+    mfcFp.open(mfcPath);
+    if (!mfcFp.is_open()) {
+        std::cerr << "Unable to open output file: " << mfcPath << std::endl;
+        wavFp.close();
+    }
+
+    emit control7(wavFp, mfcFp);
+
+
+
+    /* paint_face = true;
+    update(); */
 }
 
 void PaintedLevels::levelsTimeout()
