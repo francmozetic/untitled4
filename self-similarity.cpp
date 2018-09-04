@@ -108,7 +108,8 @@ int SelfSimilarity::process(std::ifstream &wavFp, std::ofstream &mfcFp) {
     // Initialise buffer (allocate a block of memory of type int16_t, dynamically allocated memory is allocated on Heap^)
     uint16_t bufferLength = winWidthSamples - frameShiftSamples;
     int16_t* buffer = new int16_t[bufferLength];
-    int bufferBPS = (sizeof buffer[0]);                     // bytes per sample (size of the first element in bytes)
+    // Calculate bytes per sample (size of the first element in bytes)
+    int bufferBPS = (sizeof buffer[0]);
 
     // Read and set the initial samples
     wavFp.read((char *) buffer, bufferLength*bufferBPS);    // cast the pointer of the int16_t variable to a pointer to characters/bytes
