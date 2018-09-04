@@ -123,12 +123,12 @@ void PaintedLevels::paint(QPainter *painter)
         }
         painter->drawLine(0, 349, 2500, 349);
 
-        QString bufferReference = "title: Lemmy's Voice 1.0";
+        QString bufferReference = "title: Lemmy's Voice 1.1";
         QString bufferLicense = "license: GPL";
         QString bufferAuthor = "author: Aleksander Mozetic";
         QString bufferDescription = "description: A simple Linux embedded application";
         QString bufferModule = "module: Toradex Apalis iMX6 computer on module";
-        QString bufferVersion = "version: 1.0";
+        QString bufferVersion = "version: 1.1";
 
         painter->setFont(QFont("Arial", 45));
         painter->drawText(5, 54, bufferReference);

@@ -34,12 +34,12 @@ std::map<int, std::map<int, std::complex<double>>> twiddle;
 
 SelfSimilarity::SelfSimilarity(QObject *parent) : QObject(parent)
 {
-    fs = 16000;                 // Sampling rate in Hertz (default=16000)
+    fs = 8000;                  // Sampling rate in Hertz (default=16000)
     numCepstral = 12;           // Number of output cepstra, excluding log-energy (default=12)
     numFilters = 40;            // Number of Mel warped filters in filterbank (default=40)
-    preEmphCoef = 0.97;         // ok
+    preEmphCoef = 0.97;         // Pre-emphasis coefficient
     lowFreq = 50;               // Filterbank low frequency cutoff in Hertz (default=50)
-    highFreq = 8000;            // Filterbank high freqency cutoff in Hertz (default=fs/2)
+    highFreq = 4000;            // Filterbank high freqency cutoff in Hertz (default=fs/2)
     numFFT = 512;               // N-point FFT on each frame
     winWidth = 25;              // Width of analysis window in milliseconds (default=25)
     frameShift = 10;            // Frame shift in milliseconds (default=10)
@@ -101,7 +101,7 @@ int SelfSimilarity::process(std::ifstream &wavFp, std::ofstream &mfcFp) {
     }
     // Check sampling rate
     if (hdr.SamplesPerSec != fs) {
-        qDebug() << "Sampling rate mismatch: Found " << hdr.SamplesPerSec << " instead of " << fs;
+        qDebug() << "Sampling rate mismatch: Found" << hdr.SamplesPerSec << "instead of" << fs;
         return 1;
     }
 
