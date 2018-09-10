@@ -30,6 +30,7 @@ const double PI = 4*atan(1.0);
 size_t winWidthSamples, frameShiftSamples, numFFTBins;
 std::vector<double> frame, prevSamples, powerSpectralCoef, lmfbCoef, hamming, mfcc;
 std::vector<std::vector<double>> fbank, dct;
+std::vector<std::vector<double>> vecdmfcc;
 std::map<int, std::map<int, std::complex<double>>> twiddle;
 
 SelfSimilarity::SelfSimilarity(QObject *parent) : QObject(parent)
@@ -59,7 +60,87 @@ SelfSimilarity::~SelfSimilarity()
 {
 }
 
-// Convert vector of double to string (for writing MFCC file output)
+// Calculate cosine similarity between two vectors
+double SelfSimilarity::cosine_similarity(std::vector<double> veca, std::vector<double> vecb) {
+
+    double multiply = 0.0;
+    double d_a = 0.0;
+    double d_b = 0.0;
+
+    std::vector<double>::iterator itera, iterb;
+
+    for (itera = veca.begin(), iterb = vecb.begin(); itera != veca.end(); itera++, iterb++) {
+        multiply += *itera * *iterb;
+        d_a += *itera * *itera;
+        d_b += *iterb * *iterb;
+    }
+
+    return multiply / (sqrt(d_a) * sqrt(d_b));
+}
+
+// Process each frame and return MFCCs as vector of double
+std::vector<double> SelfSimilarity::processFrameTo(int16_t* samples, size_t N) {
+    // Add samples from the previous frame that overlap with the current frame to the current samples and create the frame.
+    frame = prevSamples;
+    for (size_t i=0; i<N; i++)
+        frame.push_back(samples[i]);
+    prevSamples.assign(frame.begin()+frameShiftSamples, frame.end());
+
+    preEmphHamming();
+    compPowerSpec();
+    applyLogMelFilterbank();
+    applyDct();
+
+    return mfcc;
+}
+
+// Read input file stream, extract MFCCs
+int SelfSimilarity::processTo(std::ifstream &wavFp) {
+    // Read the wav header
+    wavHeader hdr;
+    int headerSize = sizeof(wavHeader);
+    wavFp.read((char *) &hdr, headerSize); // cast the address of hdr, denoted &hdr, to a char *, i.e. a pointer to characters/bytes
+
+    // Check audio format
+    if (hdr.AudioFormat != 1 || hdr.bitsPerSample != 16) {
+        qDebug() << "Unsupported audio format, use 16 bit PCM Wave";
+        return 1;
+    }
+    // Check sampling rate
+    if (hdr.SamplesPerSec != fs) {
+        qDebug() << "Sampling rate mismatch: Found" << hdr.SamplesPerSec << "instead of" << fs;
+        return 1;
+    }
+
+    // Initialise buffer (allocate a block of memory of type int16_t, dynamically allocated memory is allocated on Heap^)
+    uint16_t bufferLength = winWidthSamples - frameShiftSamples;
+    int16_t* buffer = new int16_t[bufferLength];
+    // Calculate bytes per sample (size of the first element in bytes)
+    int bufferBPS = (sizeof buffer[0]);
+
+    // Read and set the initial samples
+    wavFp.read((char *) buffer, bufferLength*bufferBPS);    // cast the pointer of the int16_t variable to a pointer to characters/bytes
+    for (int i=0; i<bufferLength; i++)
+        prevSamples[i] = buffer[i];                         // prevSamples[i] is an ith element of std::vector<double>
+    delete [] buffer;
+
+    // Recalculate buffer size
+    bufferLength = frameShiftSamples;
+    buffer = new int16_t[bufferLength];
+
+    // Allocate memory for 500 coefficients, read data and process each frame
+    vecdmfcc.reserve(500);
+    wavFp.read((char *) buffer, bufferLength*bufferBPS);
+    while (wavFp.gcount() == bufferLength*bufferBPS && !wavFp.eof() && vecdmfcc.size() < 500) {
+        vecdmfcc.push_back(processFrameTo(buffer, bufferLength));
+        wavFp.read((char *) buffer, bufferLength*bufferBPS);
+    }
+    delete [] buffer;
+    buffer = nullptr;
+    return 0;
+}
+
+// Convert vector of double to string
 std::string v_d_to_string (v_d vec) {
     // The class template std::basic_stringstream implements operations on memory based streams.
     std::stringstream vecStream;
@@ -72,7 +153,7 @@ std::string v_d_to_string (v_d vec) {
     return vecStream.str();
 }
 
-// Process each frame and extract MFCC
+// Process each frame and extract MFCCs as string
 std::string SelfSimilarity::processFrame(int16_t* samples, size_t N) {
     // Add samples from the previous frame that overlap with the current frame to the current samples and create the frame.
     frame = prevSamples;
@@ -131,29 +212,6 @@ int SelfSimilarity::process(std::ifstream &wavFp, std::ofstream &mfcFp) {
     delete [] buffer;
     buffer = nullptr;
     return 0;
-}
-
-// Calculate cosine similarity between two vectors
-double cosine_similarity(std::vector<double> veca, std::vector<double> vecb) {
-
-    double multiply = 0.0;
-    double d_a = 0.0;
-    double d_b = 0.0;
-
-    if (veca.size() != vecb.size())
-    {
-        throw std::logic_error("Vector A and vector B are not the same size.");
-    }
-
-    std::vector<double>::iterator itera, iterb;
-
-    for (itera = veca.begin(), iterb = vecb.begin(); itera != veca.end(); itera++, iterb++) {
-        multiply += *itera * *iterb;
-        d_a += *itera * *itera;
-        d_b += *iterb * *iterb;
-    }
-
-    return multiply / (sqrt(d_a) * sqrt(d_b));
 }
 
 // ***** Conversion functions and FFT recursive function *****
