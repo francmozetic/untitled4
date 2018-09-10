@@ -61,6 +61,7 @@ SelfSimilarity::~SelfSimilarity()
 
 // Convert vector of double to string (for writing MFCC file output)
 std::string v_d_to_string (v_d vec) {
+    // The class template std::basic_stringstream implements operations on memory based streams.
     std::stringstream vecStream;
     for (size_t i=0; i<vec.size()-1; i++) {
         vecStream << std::scientific << vec[i];
