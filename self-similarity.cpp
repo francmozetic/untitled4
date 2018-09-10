@@ -133,6 +133,29 @@ int SelfSimilarity::process(std::ifstream &wavFp, std::ofstream &mfcFp) {
     return 0;
 }
 
+// Calculate cosine similarity between two vectors
+double cosine_similarity(std::vector<double> veca, std::vector<double> vecb) {
+
+    double multiply = 0.0;
+    double d_a = 0.0;
+    double d_b = 0.0;
+
+    if (veca.size() != vecb.size())
+    {
+        throw std::logic_error("Vector A and vector B are not the same size.");
+    }
+
+    std::vector<double>::iterator itera, iterb;
+
+    for (itera = veca.begin(), iterb = vecb.begin(); itera != veca.end(); itera++, iterb++) {
+        multiply += *itera * *iterb;
+        d_a += *itera * *itera;
+        d_b += *iterb * *iterb;
+    }
+
+    return multiply / (sqrt(d_a) * sqrt(d_b));
+}
+
 // ***** Conversion functions and FFT recursive function *****
 
 // Hertz to Mel conversion
