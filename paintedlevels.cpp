@@ -44,7 +44,7 @@ PaintedLevels::PaintedLevels(QQuickItem *parent) : QQuickPaintedItem(parent)
     restfulThread.start();
 
     SelfSimilarity *mfccProcess = new SelfSimilarity();
-    QObject::connect(this, &PaintedLevels::control7, mfccProcess, &SelfSimilarity::process);
+    QObject::connect(this, &PaintedLevels::control7, mfccProcess, &SelfSimilarity::processTo);
 
     const qint64 waveformDurationUs = 2.0 * 1000000;        // waveform window duration in microsec
     const qint64 analysisDurationUs = 0.1 * 1000000;        // analysis window duration in microsec

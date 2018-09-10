@@ -31,6 +31,7 @@ size_t winWidthSamples, frameShiftSamples, numFFTBins;
 std::vector<double> frame, prevSamples, powerSpectralCoef, lmfbCoef, hamming, mfcc;
 std::vector<std::vector<double>> fbank, dct;
 std::vector<std::vector<double>> vecdmfcc;
+std::vector<double> vecdsimilarity;
 std::map<int, std::map<int, std::complex<double>>> twiddle;
 
 SelfSimilarity::SelfSimilarity(QObject *parent) : QObject(parent)
@@ -94,7 +95,7 @@ std::vector<double> SelfSimilarity::processFrameTo(int16_t* samples, size_t N) {
     return mfcc;
 }
 
-// Read input file stream, extract MFCCs
+// Read input file stream, extract Mel-Frequency Cepstral Coefficients
 int SelfSimilarity::processTo(std::ifstream &wavFp) {
     // Read the wav header
     wavHeader hdr;
@@ -130,11 +131,23 @@ int SelfSimilarity::processTo(std::ifstream &wavFp) {
 
     // Allocate memory for 500 coefficients, read data and process each frame
     vecdmfcc.reserve(500);
+    vecdmfcc.clear();
     wavFp.read((char *) buffer, bufferLength*bufferBPS);
     while (wavFp.gcount() == bufferLength*bufferBPS && !wavFp.eof() && vecdmfcc.size() < 500) {
         vecdmfcc.push_back(processFrameTo(buffer, bufferLength));
         wavFp.read((char *) buffer, bufferLength*bufferBPS);
     }
+
+    // Allocate memory for self-similarity coefficients
+    vecdsimilarity.reserve(500);
+    vecdsimilarity.clear();
+    std::vector<double> veca = vecdmfcc.front();
+    std::vector<double> vecb = vecdmfcc.front();
+    vecdsimilarity.push_back(cosine_similarity(veca, vecb));
+    qDebug() << vecdsimilarity.front();
+
+
+
     delete [] buffer;
     buffer = nullptr;
     return 0;
