@@ -8,7 +8,6 @@ class PaintedLevels : public QQuickPaintedItem
 {
     Q_OBJECT
     QThread restfulThread;
-    QThread mfccThread;
 
 public:
     PaintedLevels(QQuickItem *parent = 0);
@@ -38,25 +37,23 @@ public slots:
     void levelsPutJson(int index);
     void levelsDeleteJson(int index);
 
-    void getLocalFile(const QString &msg);
-
     void paintClicked(const QString &msg);
     void bufferChanged(qint64 position, qint64 length, const QByteArray &buffer);
+
+    void getLocalFile(const QString &msg);
 
 private:
     qint64 audioLength(const QAudioFormat &format, qint64 microSeconds);
     QString formatToString(const QAudioFormat &format);
-
     void calculateLevelsAll(qint64 position, qint64 length);
 
     qint64              m_bufferPosition;
     qint64              m_bufferLength;
     QByteArray          m_buffer;
 
-    qint64              m_audioPosition;
-    QAudioFormat        m_format;
+    QAudioFormat        m_format;                           // ok
 
-    qint64              m_windowPosition;
+    qint64              m_windowPosition;                   // ok
     qint64              m_windowLength;                     // ok
 
     QSize               m_analysisSize;                     // ok

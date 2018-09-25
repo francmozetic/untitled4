@@ -281,7 +281,6 @@ void PaintedLevels::reset()
 {
     m_bufferPosition = 0;
     m_buffer = QByteArray();
-    m_audioPosition = 0;
     m_format = QAudioFormat();
     m_windowPosition = 0;
     m_windowLength = 0;
@@ -764,11 +763,6 @@ void PaintedLevels::levelsDeleteJson(int index)                                 
     reply->deleteLater();
 }
 
-void PaintedLevels::getLocalFile(const QString &msg)
-{
-    localFile = msg;
-}
-
 void PaintedLevels::paintClicked(const QString &msg)                            // ok
 {
     if (m_selection == 1) {
@@ -784,4 +778,9 @@ void PaintedLevels::paintClicked(const QString &msg)                            
         paint_fingerprint = true;
         update();
     }
+}
+
+void PaintedLevels::getLocalFile(const QString &msg)
+{
+    localFile = msg;
 }
