@@ -12,16 +12,16 @@ ApplicationWindow {
 
     StackLayout {
         id:layout1
-        x: 9
-        y: 9
-        width: 782
-        height: 350
+        x: 5
+        y: 5
+        width: 790
+        height: 365
         currentIndex: 0
 
         Flickable {
             id: flickable1
-            width: 782
-            height: 350
+            width: 790
+            height: 365
             contentWidth: levels1.width
             contentHeight: levels1.height
             clip: true
@@ -30,7 +30,7 @@ ApplicationWindow {
                 id: levels1
                 objectName: "levels1"
                 width: 2500
-                height: 350
+                height: 365
                 signal qmlSignal(string msg)
                 signal pathSignal(string msg)
 
@@ -45,10 +45,10 @@ ApplicationWindow {
         }
 
         Rectangle {
-            x: 9
-            y: 9
-            width: 782
-            height: 350
+            x: 5
+            y: 5
+            width: 790
+            height: 365
             color: "black"
 
             ListModel {
@@ -179,8 +179,8 @@ ApplicationWindow {
 
     Button {
         id: button1
-        x: 9
-        y: 371
+        x: 5
+        y: 375
         width: 100
         height: 100
         text: qsTr("")
@@ -194,8 +194,8 @@ ApplicationWindow {
 
     Button {
         id: button2
-        x: 115
-        y: 371
+        x: 111
+        y: 375
         width: 100
         height: 100
         text: qsTr("")
@@ -208,8 +208,8 @@ ApplicationWindow {
 
     Button {
         id: button3
-        x: 221
-        y: 371
+        x: 217
+        y: 375
         width: 100
         height: 100
         Image {
@@ -221,8 +221,8 @@ ApplicationWindow {
 
     Button {
         id: button4
-        x: 327
-        y: 371
+        x: 323
+        y: 375
         width: 100
         height: 100
         text: qsTr("")
@@ -235,8 +235,8 @@ ApplicationWindow {
 
     Button {
         id: button5
-        x: 433
-        y: 371
+        x: 429
+        y: 375
         width: 100
         height: 100
         text: qsTr("")
@@ -249,8 +249,8 @@ ApplicationWindow {
 
     Button {
         id: button6
-        x: 538
-        y: 371
+        x: 534
+        y: 375
         width: 100
         height: 100
         text: qsTr("")
@@ -263,8 +263,8 @@ ApplicationWindow {
 
     Button {
         id: button7
-        x: 691
-        y: 371
+        x: 695
+        y: 375
         width: 100
         height: 100
         text: qsTr("")
@@ -278,8 +278,8 @@ ApplicationWindow {
 
     Button {
         id: button10
-        x: 691
-        y: 371
+        x: 695
+        y: 375
         width: 100
         height: 100
         text: qsTr("")

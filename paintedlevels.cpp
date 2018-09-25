@@ -88,7 +88,7 @@ void PaintedLevels::paint(QPainter *painter)
 
     QBrush brush1 = QBrush(Qt::black);
     painter->setBrush(brush1);
-    painter->drawRect(0, 0, 2500, 350);
+    painter->drawRect(0, 0, 2500, 365);
 
     QBrush transparent = QBrush(Qt::transparent);
     painter->setBrush(transparent);
@@ -241,7 +241,7 @@ void PaintedLevels::paint(QPainter *painter)
         for (size_t j=0; j<350; j++) {
             if (j > 0) d += j-1;
             for (size_t i=0; i<500-j; i++) {
-                float scale = vecdsimilarity[j*500 - d + i] / 0.020;    // scale self-similarity measures to the range
+                float scale = vecdsimilarity[j*500 - d + i] / 0.015;    // scale self-similarity measures to the range
                 if (scale < 0.0) scale = 0.0;
                 if (scale > 1.0) scale = 1.0;
 
@@ -480,6 +480,11 @@ void PaintedLevels::levelsCloudQueue()                                          
     emit control4();
 }
 
+void PaintedLevels::levelsTimeout()                                             // ok
+{
+    emit control5();
+}
+
 void PaintedLevels::levelsFace()                                                // ok
 {
     // Initialise input and output streams
@@ -505,16 +510,6 @@ void PaintedLevels::levelsFace()                                                
     emit control7(wavFp, mfcFp);
     paint_similarity = true;
     update();
-
-
-
-    /* paint_face = true;
-    update(); */
-}
-
-void PaintedLevels::levelsTimeout()
-{
-    emit control5();
 }
 
 void PaintedLevels::levelsPostJson()                                            // ok
