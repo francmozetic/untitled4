@@ -16,6 +16,7 @@ int allBars;
 
 extern QString localFile;
 
+extern QVector<qint16> levels;
 extern QVector<qreal> levelsAll;
 extern QVector<qreal> levelsSpectrum;
 extern QVector<qreal> frequenciesSpectrum;
@@ -46,10 +47,10 @@ PaintedLevels::PaintedLevels(QQuickItem *parent) : QQuickPaintedItem(parent)
     restfulThread.start();
 
     SelfSimilarity *mfccProcess = new SelfSimilarity();
-    QObject::connect(this, &PaintedLevels::control7, mfccProcess, &SelfSimilarity::processTo);
+    QObject::connect(this, &PaintedLevels::control7, mfccProcess, &SelfSimilarity::processSamplesTo);
 
-    const qint64 waveformDurationUs = 2.0 * 1000000;        // waveform window duration in microsec
-    const qint64 analysisDurationUs = 0.1 * 1000000;        // analysis window duration in microsec
+    const qint64 waveformDurationUs = 2.0 * 1000000;        // Waveform window duration in microsec
+    const qint64 analysisDurationUs = 0.1 * 1000000;        // Analysis window duration in microsec
 
     reset();
 
@@ -148,7 +149,6 @@ void PaintedLevels::paint(QPainter *painter)
             }
             painter->drawPath(path);
         }
-
         paint_waveform = false;
         m_selection = 1;
     }
@@ -238,7 +238,7 @@ void PaintedLevels::paint(QPainter *painter)
 
         // Scale the self-similarity measures to the range [0, 1]
         float d = 0;
-        for (size_t j=0; j<350; j++) {
+        for (size_t j=0; j<365; j++) {
             if (j > 0) d += j-1;
             for (size_t i=0; i<500-j; i++) {
                 float scale = vecdsimilarity[j*500 - d + i] / 0.015;    // scale self-similarity measures to the range
@@ -266,12 +266,11 @@ void PaintedLevels::paint(QPainter *painter)
                 painter->setPen(pen);
                 QBrush brush = QBrush(color);
                 painter->setBrush(brush);
-                float x = j * 3.0 + i * 3.0;
-                float y = j * 3.0;
-                painter->drawRect(x, y, 3.0, 3.0);
+                float x = j * 1.0 + i * 1.0;
+                float y = j * 1.0;
+                painter->drawRect(x, y, 1.0, 1.0);
             }
         }
-
         paint_similarity = false;
         m_selection = 4;
     }
@@ -320,6 +319,7 @@ qint64 PaintedLevels::audioLength(const QAudioFormat &format, qint64 microSecond
 
 void PaintedLevels::calculateLevelsAll(qint64 position, qint64 length)          // ok
 {
+    levels.fill(0, length / 2);
     levelsAll.fill(0, length / 2);
 
     const char *pointer = m_buffer.constData() + position;
@@ -329,6 +329,7 @@ void PaintedLevels::calculateLevelsAll(qint64 position, qint64 length)          
         const qint16 value = *reinterpret_cast<const qint16*>(pointer);
         const qreal fracValue = qreal(value) / 32768;
         pointer += 2;
+        levels[i] = value;
         levelsAll[i] = fracValue;
         i = i + 1;
     }
@@ -506,7 +507,7 @@ void PaintedLevels::levelsFace()                                                
         wavFp.close();
     }
 
-    emit control7(wavFp, mfcFp);
+    emit control7();                                                            // emit control7(wavFp, mfcFp);
     paint_similarity = true;
     update();
 }

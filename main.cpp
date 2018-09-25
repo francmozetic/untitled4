@@ -5,6 +5,7 @@
 
 QString localFile;
 
+QVector<qint16> levels;
 QVector<qreal> levelsAll;
 QVector<qreal> levelsSpectrum;
 QVector<qreal> frequenciesSpectrum;

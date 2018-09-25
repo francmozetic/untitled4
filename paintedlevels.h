@@ -22,7 +22,9 @@ signals:
     void control3();
     void control4();
     void control5();
-    void control7(std::ifstream &wavFp, std::ofstream &mfcFp);
+    //void control7(std::ifstream &wavFp, std::ofstream &mfcFp);
+    //void control7(std::ifstream &wavFp);
+    void control7();
 
 public slots:
     void levelsRecord();

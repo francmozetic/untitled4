@@ -16,6 +16,7 @@ public:
     int process (std::ifstream &wavFp, std::ofstream &mfcFp);
     std::vector<double> processFrameTo(int16_t* samples, size_t N);
     int processTo(std::ifstream &wavFp);
+    int processSamplesTo();
     double cosine_similarity(std::vector<double> veca, std::vector<double> vecb);
 
 private:

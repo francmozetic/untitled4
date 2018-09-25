@@ -42,7 +42,7 @@ void Engine::startRecording()                               // ok
     qDebug() << "Start recording ...";
 
     QAudioFormat format;
-    format.setSampleRate(44100);
+    format.setSampleRate(44100);                            // Sampling rate in Hertz (default=44100)
     format.setSampleSize(16);
     format.setChannelCount(1);
     format.setSampleType(QAudioFormat::SignedInt);
@@ -319,19 +319,6 @@ void Engine::calculateLevels(qint64 position, qint64 length)                    
         levelsAll[i] = fracValue;
         i = i + 1;
     }
-
-    /* QString bufferStr = "0 ";
-    QString tmpStr = QString::number(levels.count());
-    bufferStr.append(tmpStr);
-    tmpStr = " ";
-    bufferStr.append(tmpStr);
-    for (int i = 0; i < levels.count(); ++i) {
-        tmpStr = QString::number(levels.at(i), 'f', 5);
-        bufferStr.append(tmpStr);
-        bufferStr.append(" ");
-    }
-
-    qDebug() << bufferStr; */
 
     emit bufferReady();
 }

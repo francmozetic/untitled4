@@ -9,7 +9,6 @@
 #include <math.h>
 
 #include <QDebug>
-#include <QColor>
 
 /* As introduced to the music information retrieval world by Jonathan Foote (2000), self-similarity matrices
  * turn multi-dimensional feature vectors from an audio signal into a clear and easily-readable 2-dimensional image. This is
@@ -34,11 +33,13 @@ std::vector<std::vector<double>> fbank, dct;
 std::vector<std::vector<double>> vecdmfcc;
 std::map<int, std::map<int, std::complex<double>>> twiddle;
 
+extern QVector<qint16> levels;
+
 extern std::vector<double> vecdsimilarity;
 
 SelfSimilarity::SelfSimilarity(QObject *parent) : QObject(parent)
 {
-    fs = 8000;                  // Sampling rate in Hertz (default=16000)
+    fs = 44100;                 // Sampling rate in Hertz (default=16000)
     numCepstral = 12;           // Number of output cepstra, excluding log-energy (default=12)
     numFilters = 40;            // Number of Mel warped filters in filterbank (default=40)
     preEmphCoef = 0.97;         // Pre-emphasis coefficient
@@ -97,6 +98,52 @@ std::vector<double> SelfSimilarity::processFrameTo(int16_t* samples, size_t N) {
     return mfcc;
 }
 
+int SelfSimilarity::processSamplesTo() {                                        // not available
+    uint16_t bufferLength = winWidthSamples - frameShiftSamples;
+    uint16_t position = bufferLength;
+
+    // Read and set the initial samples
+    for (int i=0; i<bufferLength; i++)                                          // ok
+        prevSamples[i] = levels[i];
+
+    // Initialise buffer (allocate a block of memory of type int16_t, dynamically allocated memory is allocated on Heap^)
+    bufferLength = frameShiftSamples;
+    int16_t* buffer = new int16_t[bufferLength];
+
+    // Allocate memory for 500 coefficients, read data and process each frame
+    vecdmfcc.reserve(500);
+    vecdmfcc.clear();
+
+    for (int i=0; i<bufferLength; i++)
+        buffer[i] = levels[position+i];
+    position += bufferLength;
+
+    while (position < levels.count() && vecdmfcc.size() < 500) {
+        vecdmfcc.push_back(processFrameTo(buffer, bufferLength));               // ok
+        for (int i=0; i<bufferLength; i++)
+            buffer[i] = levels[position+i];
+        position += bufferLength;
+    }
+
+    // Allocate memory for self-similarity measures
+    double measure;
+    vecdsimilarity.reserve(365 * 500);
+    vecdsimilarity.clear();
+    std::vector<double> veca, vecb;
+    for (size_t j=0; j<365; j++) {
+        veca = vecdmfcc[j];
+        for (size_t i=j; i<500; i++) {
+            vecb = vecdmfcc[i];
+            measure = 1 - cosine_similarity(veca, vecb);
+            vecdsimilarity.push_back(measure);
+        }
+    }
+
+    delete [] buffer;
+    buffer = nullptr;
+    return 0;
+}
+
 // Read input file stream, extract Mel-Frequency Cepstral Coefficients
 int SelfSimilarity::processTo(std::ifstream &wavFp) {
     // Read the wav header
@@ -120,11 +167,14 @@ int SelfSimilarity::processTo(std::ifstream &wavFp) {
     int16_t* buffer = new int16_t[bufferLength];
     // Calculate bytes per sample (size of the first element in bytes)
     int bufferBPS = (sizeof buffer[0]);
+    qDebug() << bufferLength;
 
     // Read and set the initial samples
     wavFp.read((char *) buffer, bufferLength*bufferBPS);    // cast the pointer of the int16_t variable to a pointer to characters/bytes
-    for (int i=0; i<bufferLength; i++)
+    for (int i=0; i<bufferLength; i++) {
         prevSamples[i] = buffer[i];                         // prevSamples[i] is an ith element of std::vector<double>
+        qDebug() << prevSamples[i];
+    }
     delete [] buffer;
 
     // Recalculate buffer size
@@ -228,6 +278,7 @@ int SelfSimilarity::process(std::ifstream &wavFp, std::ofstream &mfcFp) {
         mfcFp << processFrame(buffer, bufferLength);
         wavFp.read((char *) buffer, bufferLength*bufferBPS);
     }
+
     delete [] buffer;
     buffer = nullptr;
     return 0;
