@@ -132,7 +132,7 @@ void PaintedLevels::paint(QPainter *painter)
         m_analysisSize.setWidth(2500 * m_analysisLength / m_windowLength);
         int offset = m_analysisSize.width() / 2;
         if (m_positionSelected < offset) m_positionSelected = offset;
-        painter->drawRect(m_positionSelected - offset, 1, m_analysisSize.width(), 348);
+        painter->drawRect(m_positionSelected - offset, 1, m_analysisSize.width(), 365);
         QBrush transparent = QBrush(Qt::transparent);
         painter->setBrush(transparent);
 
@@ -140,10 +140,10 @@ void PaintedLevels::paint(QPainter *painter)
             QPen pen1(Qt::white, 1);
             painter->setPen(pen1);
             QPainterPath path;
-            QPointF point1 = QPointF(0, (1.0 - levelsAll.at(0)) * 175);
+            QPointF point1 = QPointF(0, (1.0 - levelsAll.at(0)) * 180);
             path.moveTo(point1);
             for (int i = 1; i < levelsAll.count(); i++) {
-                QPointF point2 = QPointF(i * 0.0283447, (1.0 - levelsAll.at(i)) * 175);
+                QPointF point2 = QPointF(i * 0.0283447, (1.0 - levelsAll.at(i)) * 180);
                 path.lineTo(point2);
             }
             painter->drawPath(path);
@@ -154,7 +154,7 @@ void PaintedLevels::paint(QPainter *painter)
     }
 
     if (paint_fingerprint == true) {
-        int numBars = 365;
+        int numBars = 350;
 
         QPen pen1(Qt::red, 1);
         painter->setPen(pen1);
@@ -163,7 +163,7 @@ void PaintedLevels::paint(QPainter *painter)
         const int numVerticalSections = 6;
         QLine lineh(0, 0, 2500, 0);
         for (int i=1; i<numVerticalSections; ++i) {
-            lineh.translate(0, 350 / numVerticalSections);
+            lineh.translate(0, 365 / numVerticalSections);
             painter->drawLine(lineh);
         }
 
@@ -175,7 +175,7 @@ void PaintedLevels::paint(QPainter *painter)
         const int barWidth = 0.8 * barPlusGapWidth;
         const int gapWidth = barPlusGapWidth - barWidth;
         const int paddingWidth = 2500 - numBars * (barWidth + gapWidth);
-        const int barHeight = 350 - 2 * gapWidth;
+        const int barHeight = 365 - 2 * gapWidth;
         // Calculate remaining bars and gaps
         const int remainingBars = paddingWidth / barPlusGapWidth;
         allBars = numBars + remainingBars;
@@ -187,7 +187,7 @@ void PaintedLevels::paint(QPainter *painter)
             bar.setLeft(gapWidth + (i * (gapWidth + barWidth)));
             bar.setWidth(barWidth);
             bar.setTop(gapWidth + (1.0 - value) * barHeight);
-            bar.setBottom(350 - gapWidth);
+            bar.setBottom(365 - gapWidth);
             QColor color = barColor;
             painter->fillRect(bar, color);
         }
@@ -199,11 +199,11 @@ void PaintedLevels::paint(QPainter *painter)
         if (x < 200.0) x = 200.0;
         if (x > 2000.0) x = 2000.0;
         painter->setFont(QFont("Arial", 90));
-        painter->drawText(x, 54 + 350 / numVerticalSections, bufferStr);
+        painter->drawText(x, 54 + 365 / numVerticalSections, bufferStr);
         bufferStr = QString::number(frequenciesSpectrum.at(m_barSelected), 'f', 0);
         bufferStr += " Hz";
         painter->setFont(QFont("Arial", 45));
-        painter->drawText(x, 54 + 2 * 350 / numVerticalSections, bufferStr);
+        painter->drawText(x, 54 + 2 * 365 / numVerticalSections, bufferStr);
         paint_fingerprint = false;
         m_selection = 2;
     }
