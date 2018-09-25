@@ -47,9 +47,6 @@ private:
     qint64 audioLength(const QAudioFormat &format, qint64 microSeconds);
     QString formatToString(const QAudioFormat &format);
 
-    void createPixmaps(const QSize &newSize);
-    void deletePixmaps();
-
     void calculateLevelsAll(qint64 position, qint64 length);
 
     qint64              m_bufferPosition;
@@ -58,18 +55,6 @@ private:
 
     qint64              m_audioPosition;
     QAudioFormat        m_format;
-
-    QSize               m_pixmapSize;
-    QVector<QPixmap*>   m_pixmaps;
-
-    struct Tile {
-        QPixmap* pixmap;                                    // Pointer into parent m_pixmaps array
-        bool painted;                                       // Flag indicating whether this tile has been painted
-    };
-
-    QVector<Tile>       m_tiles;
-    qint64              m_tileLength;                       // Length of audio data in bytes depicted by each tile
-    qint64              m_tileArrayStart;                   // Position in bytes of the first tile, relative to m_buffer
 
     qint64              m_windowPosition;
     qint64              m_windowLength;                     // ok

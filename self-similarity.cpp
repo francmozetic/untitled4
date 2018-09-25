@@ -142,10 +142,10 @@ int SelfSimilarity::processTo(std::ifstream &wavFp) {
 
     // Allocate memory for self-similarity measures
     double measure;
-    vecdsimilarity.reserve(175 * 500);
+    vecdsimilarity.reserve(350 * 500);
     vecdsimilarity.clear();
     std::vector<double> veca, vecb;
-    for (size_t j=0; j<175; j++) {
+    for (size_t j=0; j<350; j++) {
         veca = vecdmfcc[j];
         for (size_t i=j; i<500; i++) {
             vecb = vecdmfcc[i];
@@ -153,8 +153,6 @@ int SelfSimilarity::processTo(std::ifstream &wavFp) {
             vecdsimilarity.push_back(measure);
         }
     }
-
-
 
     delete [] buffer;
     buffer = nullptr;

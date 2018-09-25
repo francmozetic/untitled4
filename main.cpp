@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     // declare a pointer to a QTimer object
     QTimer *timer = new QTimer;
     QObject::connect(timer, &QTimer::timeout, paintedLevels, &PaintedLevels::levelsTimeout);
-    timer->start(500);
+    timer->start(1000);
 
     return app.exec();
 }

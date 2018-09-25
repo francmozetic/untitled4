@@ -50,7 +50,6 @@ PaintedLevels::PaintedLevels(QQuickItem *parent) : QQuickPaintedItem(parent)
 
     const qint64 waveformDurationUs = 2.0 * 1000000;        // waveform window duration in microsec
     const qint64 analysisDurationUs = 0.1 * 1000000;        // analysis window duration in microsec
-    const int waveformTileLength = 4096;                    // waveform tile length in bytes
 
     reset();
 
@@ -64,28 +63,9 @@ PaintedLevels::PaintedLevels(QQuickItem *parent) : QQuickPaintedItem(parent)
     bufferFormat = formatToString(format);
     m_format = format;
 
-    // Calculate tile size
-    m_tileLength = audioLength(m_format, waveformTileLength);
-    qDebug() << "m_tileLength =" << m_tileLength;
-
     // Calculate window size
     m_windowLength = audioLength(m_format, waveformDurationUs);
     qDebug() << "m_windowLength =" << m_windowLength;
-
-    // Calculate number of tiles required
-    int nTiles;
-    if (m_tileLength > m_windowLength) {
-        nTiles = 2;
-    }
-    else {
-        nTiles = m_windowLength / m_tileLength + 1;
-        if (m_windowLength % m_tileLength) ++nTiles;
-    }
-
-    m_pixmaps.fill(0, nTiles);
-    m_tiles.resize(nTiles);
-
-    createPixmaps(QSize(3000, 350));
 
     // Calculate analysis window size
     m_analysisPosition = 0;
@@ -168,17 +148,6 @@ void PaintedLevels::paint(QPainter *painter)
             }
             painter->drawPath(path);
         }
-
-        /* smarrirsi e un attimo ...
-        for (int i=0; i<m_tiles.count(); ++i) {
-            const Tile &tile = m_tiles[i];
-
-            if (tile.painted) {
-                const int x = i * m_pixmapSize.width();
-                QPoint pointPixmap(x, 0);
-                painter->drawPixmap(pointPixmap, *tile.pixmap);
-            }
-        } */
 
         paint_waveform = false;
         m_selection = 1;
@@ -269,10 +238,10 @@ void PaintedLevels::paint(QPainter *painter)
 
         // Scale the self-similarity measures to the range [0, 1]
         float d = 0;
-        for (size_t j=0; j<175; j++) {
+        for (size_t j=0; j<350; j++) {
             if (j > 0) d += j-1;
             for (size_t i=0; i<500-j; i++) {
-                float scale = vecdsimilarity[j*500 - d + i] / 0.015;    // scale measures to the range
+                float scale = vecdsimilarity[j*500 - d + i] / 0.020;    // scale self-similarity measures to the range
                 if (scale < 0.0) scale = 0.0;
                 if (scale > 1.0) scale = 1.0;
 
@@ -314,10 +283,6 @@ void PaintedLevels::reset()
     m_buffer = QByteArray();
     m_audioPosition = 0;
     m_format = QAudioFormat();
-    deletePixmaps();
-    m_tiles.clear();
-    m_tileLength = 0;
-    m_tileArrayStart = 0;
     m_windowPosition = 0;
     m_windowLength = 0;
 }
@@ -352,34 +317,6 @@ qint64 PaintedLevels::audioLength(const QAudioFormat &format, qint64 microSecond
     qint64 result = (format.sampleRate() * format.channelCount() * (format.sampleSize() / 8)) * microSeconds / 1000000;
     result -= result % (format.channelCount() * format.sampleSize());
     return result;
-}
-
-void PaintedLevels::createPixmaps(const QSize &widgetSize)
-{
-    m_pixmapSize = widgetSize;
-    m_pixmapSize.setWidth(qreal(widgetSize.width()) * m_tileLength / m_windowLength);
-
-    qDebug() << "PaintedLevels::createPixmaps" << "widgetSize" << widgetSize << "pixmapSize" << m_pixmapSize;
-
-    // (Re)create pixmaps
-    for (int i=0; i<m_pixmaps.size(); ++i) {
-        delete m_pixmaps[i];
-        m_pixmaps[i] = 0;
-        m_pixmaps[i] = new QPixmap(m_pixmapSize);
-    }
-
-    // Update tile pixmap pointers, and mark for repainting
-    for (int i=0; i<m_tiles.count(); ++i) {
-        m_tiles[i].pixmap = m_pixmaps[i];
-        m_tiles[i].painted = false;
-    }
-}
-
-void PaintedLevels::deletePixmaps()
-{
-    QPixmap *pixmap;
-    foreach (pixmap, m_pixmaps) delete pixmap;
-    m_pixmaps.clear();
 }
 
 void PaintedLevels::calculateLevelsAll(qint64 position, qint64 length)          // ok
