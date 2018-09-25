@@ -50,10 +50,6 @@ private:
     void createPixmaps(const QSize &newSize);
     void deletePixmaps();
 
-    int tilePixelOffset(qint64 positionOffset) const;
-    // Paint all tiles which can be painted.
-    void paintTiles();
-    void paintTile(int index);
     void calculateLevelsAll(qint64 position, qint64 length);
 
     qint64              m_bufferPosition;
