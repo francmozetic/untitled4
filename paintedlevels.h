@@ -87,7 +87,7 @@ private:
     bool paint_waveform;
     bool paint_fingerprint;
     bool paint_face;
-
+    bool paint_similarity;
     bool status_blank;
     bool status_calculateLevels;
 };

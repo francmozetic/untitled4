@@ -9,6 +9,8 @@ QVector<qreal> levelsAll;
 QVector<qreal> levelsSpectrum;
 QVector<qreal> frequenciesSpectrum;
 
+std::vector<double> vecdsimilarity;
+
 QByteArray bufferUtf8;
 
 int main(int argc, char *argv[])

@@ -20,6 +20,8 @@ extern QVector<qreal> levelsAll;
 extern QVector<qreal> levelsSpectrum;
 extern QVector<qreal> frequenciesSpectrum;
 
+extern std::vector<double> vecdsimilarity;
+
 QString bufferCodec;
 QString bufferSampleRate;
 QString bufferSampleSize;
@@ -95,6 +97,7 @@ PaintedLevels::PaintedLevels(QQuickItem *parent) : QQuickPaintedItem(parent)
     paint_waveform = false;
     paint_fingerprint = false;
     paint_face = false;
+    paint_similarity = false;
     status_calculateLevels = false;
     status_blank = false;
 }
@@ -258,6 +261,50 @@ void PaintedLevels::paint(QPainter *painter)
         painter->drawText(5, 54 + 5 * 350 / numVerticalSections, bufferChannels);
         paint_face = false;
         m_selection = 3;
+    }
+
+    if (paint_similarity == true) {
+        QColor stwhite = QColor(255, 255, 255, 255);
+        QColor stblack = QColor(0, 0, 0, 255);
+
+        // Scale the self-similarity measures to the range [0, 1]
+        float d = 0;
+        for (size_t j=0; j<175; j++) {
+            if (j > 0) d += j-1;
+            for (size_t i=0; i<500-j; i++) {
+                float scale = vecdsimilarity[j*500 - d + i] / 0.015;    // scale measures to the range
+                if (scale < 0.0) scale = 0.0;
+                if (scale > 1.0) scale = 1.0;
+
+                float red = 0.0;
+                float green = 0.0;
+                float blue = 0.0;
+                float alpha = 0.0;
+
+                red += (1 - scale) * stwhite.redF();
+                green += (1 - scale) * stwhite.greenF();
+                blue += (1 - scale) * stwhite.blueF();
+                alpha += (1 - scale) * stwhite.alphaF();
+
+                red += scale * stblack.redF();
+                green += scale * stblack.greenF();
+                blue += scale * stblack.blueF();
+                alpha += scale * stblack.alphaF();
+
+                QColor color = QColor::fromRgbF(red, green, blue, alpha);
+
+                QPen pen(color, 1);
+                painter->setPen(pen);
+                QBrush brush = QBrush(color);
+                painter->setBrush(brush);
+                float x = j * 3.0 + i * 3.0;
+                float y = j * 3.0;
+                painter->drawRect(x, y, 3.0, 3.0);
+            }
+        }
+
+        paint_similarity = false;
+        m_selection = 4;
     }
 }
 
@@ -599,6 +646,8 @@ void PaintedLevels::levelsFace()                                                
     }
 
     emit control7(wavFp, mfcFp);
+    paint_similarity = true;
+    update();
 
 
 

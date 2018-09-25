@@ -9,6 +9,7 @@
 #include <math.h>
 
 #include <QDebug>
+#include <QColor>
 
 /* As introduced to the music information retrieval world by Jonathan Foote (2000), self-similarity matrices
  * turn multi-dimensional feature vectors from an audio signal into a clear and easily-readable 2-dimensional image. This is
@@ -31,8 +32,9 @@ size_t winWidthSamples, frameShiftSamples, numFFTBins;
 std::vector<double> frame, prevSamples, powerSpectralCoef, lmfbCoef, hamming, mfcc;
 std::vector<std::vector<double>> fbank, dct;
 std::vector<std::vector<double>> vecdmfcc;
-std::vector<double> vecdsimilarity;
 std::map<int, std::map<int, std::complex<double>>> twiddle;
+
+extern std::vector<double> vecdsimilarity;
 
 SelfSimilarity::SelfSimilarity(QObject *parent) : QObject(parent)
 {
@@ -138,13 +140,19 @@ int SelfSimilarity::processTo(std::ifstream &wavFp) {
         wavFp.read((char *) buffer, bufferLength*bufferBPS);
     }
 
-    // Allocate memory for self-similarity coefficients
-    vecdsimilarity.reserve(500);
+    // Allocate memory for self-similarity measures
+    double measure;
+    vecdsimilarity.reserve(175 * 500);
     vecdsimilarity.clear();
-    std::vector<double> veca = vecdmfcc.front();
-    std::vector<double> vecb = vecdmfcc.front();
-    vecdsimilarity.push_back(cosine_similarity(veca, vecb));
-    qDebug() << vecdsimilarity.front();
+    std::vector<double> veca, vecb;
+    for (size_t j=0; j<175; j++) {
+        veca = vecdmfcc[j];
+        for (size_t i=j; i<500; i++) {
+            vecb = vecdmfcc[i];
+            measure = 1 - cosine_similarity(veca, vecb);
+            vecdsimilarity.push_back(measure);
+        }
+    }
 
 
 
