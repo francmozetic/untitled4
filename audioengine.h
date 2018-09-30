@@ -54,8 +54,6 @@ signals:
     void recordPositionChanged(qint64 position);
     // Position of the audio output device has changed.
     void playPositionChanged(qint64 position);
-    // Level changed
-    void levelChanged(qreal rmsLevel, qreal peakLevel, int numSamples);
     // Buffer containing audio data has changed.
     void bufferChanged(qint64 position, qint64 length, const QByteArray &buffer);
 

@@ -173,11 +173,6 @@ void Engine::audioNotify()                                  // ok
         case QAudio::AudioInput: {
             const qint64 levelPosition = m_dataLength - m_levelBufferLength; // m_dataLength je kazalec na konec podatkov
             m_bufferPosition = qMax(qint64(0), levelPosition);
-            /*qDebug() << "Engine::audioNotify [0]" << "bufferPosition" << m_bufferPosition << "dataLength" << m_dataLength;*/
-
-            /*if (levelPosition >= 0) {
-                calculateLevels(levelPosition, m_levelBufferLength);
-            }*/
             emit bufferChanged(0, m_dataLength, m_buffer); // to je povezava
         }
         break;
@@ -257,7 +252,7 @@ void Engine::setState(QAudio::Mode mode, QAudio::State state)                   
         emit stateChanged(m_mode, m_state);
 }
 
-void Engine::resetAudioDevices()                            // ok
+void Engine::resetAudioDevices()
 {
     delete m_audioInput;
     m_audioInput = 0;
@@ -268,7 +263,7 @@ void Engine::resetAudioDevices()                            // ok
     setPlayPosition(0);
 }
 
-void Engine::reset()                                        // ok
+void Engine::reset()
 {
     setState(QAudio::AudioInput, QAudio::StoppedState);
     setFormat(QAudioFormat());

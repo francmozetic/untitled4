@@ -49,8 +49,10 @@ PaintedLevels::PaintedLevels(QQuickItem *parent) : QQuickPaintedItem(parent)
     SelfSimilarity *mfccProcess = new SelfSimilarity();
     QObject::connect(this, &PaintedLevels::control7, mfccProcess, &SelfSimilarity::processSamplesTo);
 
-    const qint64 waveformDurationUs = 2.0 * 1000000;        // Waveform window duration in microsec
-    const qint64 analysisDurationUs = 0.1 * 1000000;        // Analysis window duration in microsec
+    // Waveform window duration in microsec
+    const qint64 waveformDurationUs = 2.0 * 1000000;
+    // Analysis window duration in microsec
+    const qint64 analysisDurationUs = 0.1 * 1000000;
 
     reset();
 
@@ -298,10 +300,8 @@ void PaintedLevels::bufferChanged(qint64 position, qint64 length, const QByteArr
         update();
     }
 
-    // nivoje računa ko je v bufferju vsaj 2 s materiala, samo enkrat
-
-    if (!status_calculateLevels && m_bufferLength > m_windowLength) {           // to je nekaj posebnega, in deluje ...
-        qDebug() << "=> m_bufferLength" << m_bufferLength;
+    // Nivoje računa ko je v bufferju vsaj 2 s materiala, samo enkrat.
+    if (!status_calculateLevels && m_bufferLength > m_windowLength) {           // to je nekaj posebnega, in deluje
         calculateLevelsAll(0, m_windowLength);
         status_calculateLevels = true;
         paint_waveform = true;
@@ -309,7 +309,7 @@ void PaintedLevels::bufferChanged(qint64 position, qint64 length, const QByteArr
     }
 }
 
-qint64 PaintedLevels::audioLength(const QAudioFormat &format, qint64 microSeconds)     // ok
+qint64 PaintedLevels::audioLength(const QAudioFormat &format, qint64 microSeconds)
 {
     qint64 result = (format.sampleRate() * format.channelCount() * (format.sampleSize() / 8)) * microSeconds / 1000000;
     result -= result % (format.channelCount() * format.sampleSize());
