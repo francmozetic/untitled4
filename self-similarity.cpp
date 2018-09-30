@@ -97,7 +97,8 @@ std::vector<double> SelfSimilarity::processFrameTo(int16_t* samples, size_t N) {
     return mfcc;
 }
 
-int SelfSimilarity::processSamplesTo() {                                        // ok
+// Read samples, extract MFCCs and calculate self-similarity measures
+int SelfSimilarity::processSamplesTo() {
     uint16_t bufferLength = winWidthSamples - frameShiftSamples;
     uint16_t position = bufferLength;
 
@@ -143,7 +144,7 @@ int SelfSimilarity::processSamplesTo() {                                        
     return 0;
 }
 
-// Read input file stream, extract Mel-Frequency Cepstral Coefficients
+// Read input file stream, extract MFCCs and calculate self-similarity measures
 int SelfSimilarity::processTo(std::ifstream &wavFp) {
     // Read the wav header
     wavHeader hdr;

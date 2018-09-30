@@ -25,8 +25,6 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine qmlEngine;
     qmlEngine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
-    /* QQuickWindow *window = qobject_cast<QQuickWindow *>(rootObject); */
-
     PaintedLevels *paintedLevels = new PaintedLevels();
     QObject *rootObject = qmlEngine.rootObjects().first();
     QObject *qmlObject = rootObject->findChild<QObject*>("levels1");
