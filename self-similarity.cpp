@@ -97,7 +97,7 @@ std::vector<double> SelfSimilarity::processFrameTo(int16_t* samples, size_t N) {
     return mfcc;
 }
 
-int SelfSimilarity::processSamplesTo() {                                        // not available
+int SelfSimilarity::processSamplesTo() {                                        // ok
     uint16_t bufferLength = winWidthSamples - frameShiftSamples;
     uint16_t position = bufferLength;
 

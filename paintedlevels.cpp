@@ -141,10 +141,10 @@ void PaintedLevels::paint(QPainter *painter)
             QPen pen1(Qt::white, 1);
             painter->setPen(pen1);
             QPainterPath path;
-            QPointF point1 = QPointF(0, (1.0 - levelsAll.at(0)) * 180);
+            QPointF point1 = QPointF(0, (1.0 - levelsAll.at(0)) * 182.5);
             path.moveTo(point1);
             for (int i = 1; i < levelsAll.count(); i++) {
-                QPointF point2 = QPointF(i * 0.0283447, (1.0 - levelsAll.at(i)) * 180);
+                QPointF point2 = QPointF(i * 0.0283447, (1.0 - levelsAll.at(i)) * 182.5);
                 path.lineTo(point2);
             }
             painter->drawPath(path);
