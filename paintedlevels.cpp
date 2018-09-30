@@ -236,12 +236,11 @@ void PaintedLevels::paint(QPainter *painter)
         QColor stwhite = QColor(255, 255, 255, 255);
         QColor stblack = QColor(0, 0, 0, 255);
 
-        // Scale the self-similarity measures to the range [0, 1]
         float d = 0;
         for (size_t j=0; j<365; j++) {
             if (j > 0) d += j-1;
-            for (size_t i=0; i<500-j; i++) {
-                float scale = vecdsimilarity[j*500 - d + i] / 0.015;    // scale self-similarity measures to the range
+            for (size_t i=0; i<790-j; i++) {
+                float scale = vecdsimilarity[j*790 - d + i] / 0.015;    // scale self-similarity measures to the range
                 if (scale < 0.0) scale = 0.0;
                 if (scale > 1.0) scale = 1.0;
 

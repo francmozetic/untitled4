@@ -29,8 +29,7 @@ typedef std::map<int, std::map<int, c_d>> twmap;
 const double PI = 4*atan(1.0);
 size_t winWidthSamples, frameShiftSamples, numFFTBins;
 std::vector<double> frame, prevSamples, powerSpectralCoef, lmfbCoef, hamming, mfcc;
-std::vector<std::vector<double>> fbank, dct;
-std::vector<std::vector<double>> vecdmfcc;
+std::vector<std::vector<double>> vecdmfcc, fbank, dct;
 std::map<int, std::map<int, std::complex<double>>> twiddle;
 
 extern QVector<qint16> levels;
@@ -103,36 +102,36 @@ int SelfSimilarity::processSamplesTo() {                                        
     uint16_t position = bufferLength;
 
     // Read and set the initial samples
-    for (int i=0; i<bufferLength; i++)                                          // ok
+    for (int i=0; i<bufferLength; i++)
         prevSamples[i] = levels[i];
 
     // Initialise buffer (allocate a block of memory of type int16_t, dynamically allocated memory is allocated on Heap^)
     bufferLength = frameShiftSamples;
     int16_t* buffer = new int16_t[bufferLength];
 
-    // Allocate memory for 500 coefficients, read data and process each frame
-    vecdmfcc.reserve(500);
+    // Allocate memory for 790 coefficients, read data and process each frame
+    vecdmfcc.reserve(790);
     vecdmfcc.clear();
 
     for (int i=0; i<bufferLength; i++)
         buffer[i] = levels[position+i];
     position += bufferLength;
 
-    while (position < levels.count() && vecdmfcc.size() < 500) {
-        vecdmfcc.push_back(processFrameTo(buffer, bufferLength));               // ok
+    while (position < levels.count() && vecdmfcc.size() < 790) {
+        vecdmfcc.push_back(processFrameTo(buffer, bufferLength));
         for (int i=0; i<bufferLength; i++)
             buffer[i] = levels[position+i];
         position += bufferLength;
     }
 
     // Allocate memory for self-similarity measures
-    double measure;
-    vecdsimilarity.reserve(365 * 500);
+    vecdsimilarity.reserve(365 * 790);
     vecdsimilarity.clear();
     std::vector<double> veca, vecb;
+    double measure;
     for (size_t j=0; j<365; j++) {
         veca = vecdmfcc[j];
-        for (size_t i=j; i<500; i++) {
+        for (size_t i=j; i<790; i++) {
             vecb = vecdmfcc[i];
             measure = 1 - cosine_similarity(veca, vecb);
             vecdsimilarity.push_back(measure);
@@ -181,23 +180,23 @@ int SelfSimilarity::processTo(std::ifstream &wavFp) {
     bufferLength = frameShiftSamples;
     buffer = new int16_t[bufferLength];
 
-    // Allocate memory for 500 coefficients, read data and process each frame
-    vecdmfcc.reserve(500);
+    // Allocate memory for 790 coefficients, read data and process each frame
+    vecdmfcc.reserve(790);
     vecdmfcc.clear();
     wavFp.read((char *) buffer, bufferLength*bufferBPS);
-    while (wavFp.gcount() == bufferLength*bufferBPS && !wavFp.eof() && vecdmfcc.size() < 500) {
+    while (wavFp.gcount() == bufferLength*bufferBPS && !wavFp.eof() && vecdmfcc.size() < 790) {
         vecdmfcc.push_back(processFrameTo(buffer, bufferLength));
         wavFp.read((char *) buffer, bufferLength*bufferBPS);
     }
 
     // Allocate memory for self-similarity measures
-    double measure;
-    vecdsimilarity.reserve(350 * 500);
+    vecdsimilarity.reserve(365 * 790);
     vecdsimilarity.clear();
     std::vector<double> veca, vecb;
-    for (size_t j=0; j<350; j++) {
+    double measure;
+    for (size_t j=0; j<365; j++) {
         veca = vecdmfcc[j];
-        for (size_t i=j; i<500; i++) {
+        for (size_t i=j; i<790; i++) {
             vecb = vecdmfcc[i];
             measure = 1 - cosine_similarity(veca, vecb);
             vecdsimilarity.push_back(measure);
